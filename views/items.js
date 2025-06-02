@@ -78,7 +78,8 @@ const firebaseConfig = {
   
         // Build card container
         const card = document.createElement("div");
-        card.className = "bg-white rounded shadow p-4 mb-4 flex flex-col justify-between";
+        // card.className = "bg-white rounded shadow p-4 mb-4 flex flex-col justify-between";
+        card.className = "bg-white rounded shadow p-4 mb-4 flex flex-col justify-between min-w-[300px]";
   
         // Status display
         const statusHtml = `
