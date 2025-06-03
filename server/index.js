@@ -1,7 +1,7 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 
@@ -13,37 +13,35 @@ app.use(express.json());
 const mongoUri = process.env.MONGO_URI;
 
 if (!mongoUri) {
-  console.error('Error: MONGO_URI not defined in .env file');
+  console.error("Error: MONGO_URI not defined in .env file");
   process.exit(1);
 }
 
-mongoose.connect(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => {
-  console.error('MongoDB connection error:', err);
-  process.exit(1);
-});
+mongoose
+  .connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 // Import routers
-const productsRouter = require('./routes/products');
-const addproductRouter = require('./routes/addproduct'); 
-const updateproductRouter = require('./routes/updateproduct'); 
-const requestitem = require('./routes/requestitem'); 
-const processrequest = require('./routes/processrequest'); 
+const productRouter = require("./routes/productRouter");
+const requestRouter = require("./routes/requestRouter");
+const authRouter = require("./routes/authRouter");
 
 // Routes
-app.get('/', (req, res) => {
-  res.send('Hello from backend!');
+app.get("/", (req, res) => {
+  res.send("Hello from backend!");
 });
 
-app.use('/products', productsRouter);
-app.use('/addproduct', addproductRouter);
-app.use('/updateproduct', updateproductRouter);
-app.use('/requestitem',requestitem);
-app.use('/processrequest',processrequest);
+app.use("/products", productRouter);
+app.use("/request", requestRouter);
+app.use("/auth", authRouter);
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
