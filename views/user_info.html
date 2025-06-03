@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: rgba(100, 100, 255, 0.4);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen p-6">
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div class="bg-white p-5 rounded-2xl shadow hover:shadow-md transition">
+      <h3 class="text-sm text-gray-500">Urgent Items</h3>
+      <p class="text-2xl font-semibold text-red-600 mt-1">3</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow hover:shadow-md transition">
+      <h3 class="text-sm text-gray-500">Active Requests</h3>
+      <p class="text-2xl font-semibold text-blue-600 mt-1">5</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow hover:shadow-md transition">
+      <h3 class="text-sm text-gray-500">Incoming Requests</h3>
+      <p class="text-2xl font-semibold text-yellow-500 mt-1">2</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow hover:shadow-md transition">
+      <h3 class="text-sm text-gray-500">Request Status</h3>
+      <p class="text-2xl font-semibold text-green-600 mt-1">6</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow hover:shadow-md transition">
+      <h3 class="text-sm text-gray-500">My Item Status</h3>
+      <p class="text-2xl font-semibold text-indigo-600 mt-1">4</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow hover:shadow-md transition">
+      <h3 class="text-sm text-gray-500">Total Issued</h3>
+      <p class="text-2xl font-semibold text-purple-600 mt-1">10</p>
+    </div>
+  </div>
+
+  <!-- Section Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Section Template -->
+    <template id="section-template">
+      <div class="bg-white rounded-xl shadow p-5">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-semibold text-title"></h2>
+          <button class="text-sm text-blue-500 hover:underline" onclick="">View All</button>
+        </div>
+        <ul class="text-sm text-gray-700 space-y-2"></ul>
+      </div>
+    </template>
+
+    <!-- Populate Sections -->
+    <script>
+      const sections = [
+        {
+          id: 'urgentModal',
+          title: 'Urgent Items',
+          color: 'text-red-600',
+          items: ['Oscilloscope - Due 2 days ago', 'Multimeter - Due yesterday', 'Arduino Uno - Due today']
+        },
+        {
+          id: 'activeModal',
+          title: 'Active Requests',
+          color: 'text-blue-600',
+          items: ['Request #1234 - Pending', 'Request #1235 - Approved', 'Request #1236 - Processing']
+        },
+        {
+          id: 'incomingModal',
+          title: 'Incoming Requests',
+          color: 'text-yellow-600',
+          items: ['User A requests Laptop', 'User B requests HDMI cable']
+        },
+        {
+          id: 'statusModal',
+          title: 'Request Status',
+          color: 'text-green-600',
+          items: ['Microscope - Approved', 'Tripod - Rejected', 'HDMI - Pending']
+        },
+        {
+          id: 'itemModal',
+          title: 'My Item Status',
+          color: 'text-indigo-600',
+          items: ['Laptop - In Use', 'Mouse - Returned', 'HDMI Cable - In Use']
+        }
+      ];
+
+      const container = document.querySelector('body > .grid:nth-of-type(2)');
+      const template = document.getElementById('section-template');
+
+      sections.forEach(({ id, title, color, items }) => {
+        const node = template.content.cloneNode(true);
+        const section = node.querySelector('div');
+        section.querySelector('h2').textContent = title;
+        section.querySelector('h2').classList.add(color);
+        const btn = section.querySelector('button');
+        btn.setAttribute('onclick', `toggleModal('${id}')`);
+        const ul = section.querySelector('ul');
+        items.forEach(i => {
+          const li = document.createElement('li');
+          li.textContent = i;
+          ul.appendChild(li);
+        });
+        container.appendChild(section);
+      });
+    </script>
+  </div>
+
+  <!-- Modals -->
+  <template id="modal-template">
+    <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-200" id="">
+      <div class="bg-white rounded-xl p-6 w-[90%] max-w-lg max-h-[80vh] overflow-y-auto shadow-xl">
+        <h3 class="text-xl font-semibold mb-4"></h3>
+        <ul class="space-y-2 text-sm list-disc pl-5"></ul>
+        <button class="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" onclick="">Close</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    const modalData = {
+      urgentModal: {
+        title: 'All Urgent Items',
+        items: ['Oscilloscope - Due 2 days ago', 'Multimeter - Due yesterday', 'Arduino Uno - Due today', 'Resistor Kit - Due 3 days ago', 'Power Supply - Due last week']
+      },
+      activeModal: {
+        title: 'All Active Requests',
+        items: ['Request #1234 - Pending', 'Request #1235 - Approved', 'Request #1236 - Processing', 'Request #1237 - Awaiting Pickup', 'Request #1238 - Denied']
+      },
+      incomingModal: {
+        title: 'Incoming Requests',
+        items: ['User A requests Laptop', 'User B requests HDMI cable', 'User C requests Arduino', 'User D requests Breadboard']
+      },
+      statusModal: {
+        title: 'Request Status',
+        items: ['Microscope - Approved', 'Tripod - Rejected', 'HDMI - Pending', 'Camera - Processing', 'Speaker - Approved']
+      },
+      itemModal: {
+        title: 'My Item Status',
+        items: ['Laptop - In Use', 'Mouse - Returned', 'HDMI Cable - In Use', 'Power Adapter - In Use', 'Tool Kit - Returned']
+      }
+    };
+
+    Object.entries(modalData).forEach(([id, { title, items }]) => {
+      const tpl = document.getElementById('modal-template').content.cloneNode(true);
+      const modal = tpl.querySelector('div');
+      modal.id = id;
+      modal.querySelector('h3').textContent = title;
+      modal.querySelector('button').setAttribute('onclick', `toggleModal('${id}')`);
+      const ul = modal.querySelector('ul');
+      items.forEach(i => {
+        const li = document.createElement('li');
+        li.textContent = i;
+        ul.appendChild(li);
+      });
+      document.body.appendChild(modal);
+    });
+
+    function toggleModal(id) {
+      document.getElementById(id).classList.toggle('hidden');
+    }
+  </script>
+</body>
+
+</html>
