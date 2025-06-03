@@ -3,22 +3,39 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-// registration
+/* Register user
+return status 409: user already exist
+      status 201: success
+      status 409: Registration Failed
+*/
 exports.registerUser = async (req, res) => {
   try {
-    const { username, password, roles } = req.body;
-    // hash password and save user
+    const { username, password, roles, contactNo } = req.body;
+
+    // Check if user already exists by username
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(409).json({ error: "User already exists" });
+    }
+
+    // Hash password and save user
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, password: hashedPassword, roles });
+    const user = new User({ username, password: hashedPassword, roles, contactNo });
     await user.save();
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Registration failed" });
   }
 };
 
-// login
+
+/* Login user
+return status 401: Authentication failed
+       status 200.json(json token): success
+       status 500: Login Failed
+*/
 exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;

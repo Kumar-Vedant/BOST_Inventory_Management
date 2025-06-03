@@ -1,22 +1,34 @@
 const Item = require("../models/Item");
 
+/* List product containing search query
+parameter search (in url)
+return status 200.json(products): success
+       status 500: error
+*/
 exports.searchProducts = async (req, res) => {
   try {
     const searchQuery = req.query.search || "";
-    console.log("search Query is", searchQuery);
     const filter = searchQuery ? { itemName: { $regex: searchQuery, $options: "i" } } : {};
     const products = await Item.find(filter).sort({ availableQuantity: 1 });
-    res.json(products);
-    console.log("items searched");
+    res.status(200).json(products);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
+// Add functionality to create closed transacction of new item added
+
+/* add product or increase quantity
+body json(itemName,quantity)
+return status 201: new item added
+       status 200: item quantity updated
+       status 500: error
+*/
 exports.addProduct = async (req, res) => {
   try {
-    let { itemName, quantity, ownerId } = req.body;
+    let { itemName, quantity } = req.body;
+    const ownerId = req.userId; 
 
     // Basic validation
     if (!itemName || !quantity || !ownerId) {
@@ -57,33 +69,45 @@ exports.addProduct = async (req, res) => {
   }
 };
 
+// Add functionality to create closed transacction of product updated
+
+/* update product
+body json(itemUID,newName(optional),decreaseQuantity(optional))
+return status 400: itemUID is required/invalid fields
+       status 404: Item not found
+       status 403: Not authorized to update this item
+       status 200: success
+       status 500: server error
+*/
 exports.updateProduct = async (req, res) => {
   try {
     const { itemUID, newName, decreaseQuantity } = req.body;
 
-    // Validate input
     if (!itemUID) {
       return res.status(400).json({ message: "itemUID is required" });
     }
 
     const item = await Item.findById(itemUID);
-
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
 
-    // Update name if provided
-    if (newName) {
-      item.itemName = newName;
+    // Allow Admin to update any item, otherwise only owner can update their item
+    if (req.userRole !== "Admin" && item.ownerId !== req.userId) {
+      return res.status(403).json({ message: "Not authorized to update this item" });
     }
 
-    // Decrease quantity if provided
+    // Update itemName if valid newName provided
+    if (newName && typeof newName === "string" && newName.trim() !== "") {
+      item.itemName = newName.trim();
+    }
+
+    // Decrease quantity if provided and valid
     if (decreaseQuantity !== undefined) {
       const qty = parseInt(decreaseQuantity);
       if (isNaN(qty) || qty <= 0) {
         return res.status(400).json({ message: "decreaseQuantity must be a positive number" });
       }
-
       if (item.availableQuantity - qty < 0 || item.totalQuantity - qty < 0) {
         return res.status(400).json({ message: "Cannot reduce quantity below 0" });
       }

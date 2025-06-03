@@ -11,8 +11,12 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   roles: {
-    type: [String],
-    default: [],
+    type: String,
+    deafult: "User",  //User or Admin  case sensitive
+  },
+  contactNo: {
+    type: String,
+    required:true,
   },
 });
 

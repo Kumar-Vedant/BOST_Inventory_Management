@@ -9,6 +9,7 @@ const itemSchema = new mongoose.Schema({
   ownerId: {
     type: String,
     required: true,
+    index:true,
   },
   totalQuantity: {
     type: Number,
