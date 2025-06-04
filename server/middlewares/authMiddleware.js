@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 function authorizeRoles(...allowedRoles) {
   return (req, res, next) => {
-    if (!allowedRoles.includes(req.userRole)) {
+    if (!allowedRoles.includes(req.userRoles)) {
       return res.status(403).json({ error: "Access forbidden: insufficient privileges" });
     }
     next();
@@ -12,7 +12,8 @@ function authorizeRoles(...allowedRoles) {
 }
 
 function verifyToken(req, res, next) {
-  const token = req.header("Authorization");
+  // get token from cookie
+  const token = req.cookies.token;
 
   if (!token) {
     return res.status(401).json({ error: "Access denied" });

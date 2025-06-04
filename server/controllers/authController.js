@@ -30,7 +30,6 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-
 /* Login user
 return status 401: Authentication failed
        status 200.json(json token): success
@@ -56,6 +55,8 @@ exports.loginUser = async (req, res) => {
     const token = jwt.sign({ userId: user._id, userRoles: user.roles }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
+    // res.status(200).json({ token });
+    res.cookie("token", token, { httpOnly: true });
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: "Login failed" });
